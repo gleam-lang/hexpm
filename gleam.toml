@@ -1,18 +1,18 @@
 name = "gleam_hexpm"
 version = "0.1.0"
-description = "A Gleam project"
+description = "Gleam dynamic decoders for the API of Hex, the package manager for the BEAM ecosystem."
 
-# Fill out these fields if you intend to generate HTML documentation or publish
-# your project to the Hex package manager.
-#
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "username", repo = "project" }
-# links = [{ title = "Website", href = "https://gleam.run" }]
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "gleam-lang", repo = "hexpm" }
+links = [
+  { title = "Website", href = "https://gleam.run" },
+  { title = "Sponsor", href = "https://github.com/sponsors/lpil" },
+]
 
 [dependencies]
 gleam_stdlib = "~> 0.28"
 birl = "~> 0.9"
-gleam_json = "~> 0.5"
 
 [dev-dependencies]
 gleeunit = "~> 0.10"
+gleam_json = "~> 0.5"
