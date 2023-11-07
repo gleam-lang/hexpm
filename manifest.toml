@@ -2,16 +2,16 @@
 # You typically do not need to edit this file
 
 packages = [
-  { name = "birl", version = "0.9.0", build_tools = ["gleam"], requirements = ["gleam_stdlib", "ranger"], otp_app = "birl", source = "hex", outer_checksum = "D5CA75BEB39A10A310187D2B2FC9407595E80469FD8D06F316836EA346C2FF60" },
-  { name = "gleam_json", version = "0.5.1", build_tools = ["gleam"], requirements = ["gleam_stdlib", "thoas"], otp_app = "gleam_json", source = "hex", outer_checksum = "9A805C1E60FB9CD73AF3034EB464268A6B522D937FCD2DF92BD246F2F4B37930" },
-  { name = "gleam_stdlib", version = "0.28.1", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "73F0A89FADE5022CBEF6D6C3551F9ADCE7054AFCE0CB1DC4C6D5AB4CA62D0111" },
-  { name = "gleeunit", version = "0.10.1", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "ECEA2DE4BE6528D36AFE74F42A21CDF99966EC36D7F25DEB34D47DD0F7977BAF" },
-  { name = "ranger", version = "0.2.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "70FF9A5BACD1E6D53C1D7DED93C103671E1C82B033AE254526E907CBC59C848B" },
+  { name = "birl", version = "0.17.0", build_tools = ["gleam"], requirements = ["ranger", "gleam_stdlib"], otp_app = "birl", source = "hex", outer_checksum = "AEA55D2329E13E72CB7FCC0FBAE640C453E6C9BF45B8D9DB4D7457F7F5C18F49" },
+  { name = "gleam_json", version = "0.7.0", build_tools = ["gleam"], requirements = ["thoas", "gleam_stdlib"], otp_app = "gleam_json", source = "hex", outer_checksum = "CB405BD93A8828BCD870463DE29375E7B2D252D9D124C109E5B618AAC00B86FC" },
+  { name = "gleam_stdlib", version = "0.32.0", build_tools = ["gleam"], requirements = [], otp_app = "gleam_stdlib", source = "hex", outer_checksum = "07D64C26D014CF570F8ACADCE602761EA2E74C842D26F2FD49B0D61973D9966F" },
+  { name = "gleeunit", version = "1.0.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "gleeunit", source = "hex", outer_checksum = "D3682ED8C5F9CAE1C928F2506DE91625588CC752495988CBE0F5653A42A6F334" },
+  { name = "ranger", version = "0.5.0", build_tools = ["gleam"], requirements = ["gleam_stdlib"], otp_app = "ranger", source = "hex", outer_checksum = "653A15D0C73E75AD4EC6DE40478F0EBBA1157D0F5BB16FDD454D0C1129C32D41" },
   { name = "thoas", version = "0.4.1", build_tools = ["rebar3"], requirements = [], otp_app = "thoas", source = "hex", outer_checksum = "4918D50026C073C4AB1388437132C77A6F6F7C8AC43C60C13758CC0ADCE2134E" },
 ]
 
 [requirements]
-birl = "~> 0.9"
-gleam_json = "~> 0.5"
-gleam_stdlib = "~> 0.28"
-gleeunit = "~> 0.10"
+birl = { version = "~> 0.9" }
+gleam_json = { version = "~> 0.5" }
+gleam_stdlib = { version = "~> 0.28" }
+gleeunit = { version = "~> 1.0" }

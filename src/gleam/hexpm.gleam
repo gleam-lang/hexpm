@@ -1,9 +1,9 @@
-import gleam/dynamic.{DecodeError, Dynamic} as dyn
-import gleam/map.{Map}
-import gleam/option.{None, Option}
+import gleam/dynamic.{type DecodeError, type Dynamic, DecodeError} as dyn
+import gleam/map.{type Map}
+import gleam/option.{type Option, None}
 import gleam/function
 import gleam/result
-import birl/time.{DateTime}
+import birl/time.{type DateTime}
 
 /// Information on a package from Hex's `/api/packages` endpoint.
 pub type Package {

@@ -5,7 +5,7 @@ import gleam/hexpm.{
   Package, PackageMeta, PackageOwner, PackageRelease, Release, ReleaseMeta,
   ReleaseRetirement, Security,
 }
-import birl/time.{DateTime}
+import birl/time.{type DateTime}
 import gleeunit/should
 
 pub fn hex_package_decoder_test() {
