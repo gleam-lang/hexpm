@@ -1,11 +1,11 @@
 import gleam/json
-import gleam/map
+import gleam/dict
 import gleam/option.{None, Some}
 import gleam/hexpm.{
   Package, PackageMeta, PackageOwner, PackageRelease, Release, ReleaseMeta,
   ReleaseRetirement, Security,
 }
-import birl/time.{type DateTime}
+import birl.{type Time}
 import gleeunit/should
 
 pub fn hex_package_decoder_test() {
@@ -77,13 +77,13 @@ pub fn hex_package_decoder_test() {
     docs_html_url: Some("https://hexdocs.pm/shimmer/"),
     meta: PackageMeta(
       description: Some("A Gleam library for interacting with the Discord API"),
-      links: map.from_list([
+      links: dict.from_list([
         #("Repository", "https://github.com/HarryET/shimmer"),
         #("Website", "https://gleampkg.com/packages/shimmer"),
       ]),
       licenses: ["Apache-2.0"],
     ),
-    downloads: map.from_list([#("all", 17), #("recent", 1)]),
+    downloads: dict.from_list([#("all", 17), #("recent", 1)]),
     owners: Some([
       PackageOwner(
         username: "harryet",
@@ -108,8 +108,8 @@ pub fn hex_package_decoder_test() {
   ))
 }
 
-fn timestamp(string: String) -> DateTime {
-  let assert Ok(t) = time.from_iso8601(string)
+fn timestamp(string: String) -> Time {
+  let assert Ok(t) = birl.parse(string)
   t
 }
 
@@ -167,13 +167,13 @@ pub fn hex_packages_decoder_test() {
     docs_html_url: Some("https://hexdocs.pm/activity_pub/"),
     meta: PackageMeta(
       description: None,
-      links: map.from_list([
+      links: dict.from_list([
         #("GitHub", "https://github.com/coryodaniel/activity_pub"),
         #("W3C", "https://www.w3.org/TR/activitypub/"),
       ]),
       licenses: ["MIT"],
     ),
-    downloads: map.from_list([#("all", 2438), #("recent", 12)]),
+    downloads: dict.from_list([#("all", 2438), #("recent", 12)]),
     owners: None,
     releases: [
       PackageRelease(

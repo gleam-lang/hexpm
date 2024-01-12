@@ -1,5 +1,5 @@
 name = "gleam_hexpm"
-version = "0.2.0"
+version = "0.3.0"
 description = "Gleam dynamic decoders for the API of Hex, the package manager for the BEAM ecosystem."
 
 licences = ["Apache-2.0"]
@@ -8,12 +8,12 @@ links = [
   { title = "Website", href = "https://gleam.run" },
   { title = "Sponsor", href = "https://github.com/sponsors/lpil" },
 ]
-gleam = ">= 0.32.0"
+gleam = ">= 0.33.0"
 
 [dependencies]
-gleam_stdlib = "~> 0.28"
-birl = "~> 0.9"
+gleam_stdlib = "~> 0.34"
+birl = "~> 1.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"
-gleam_json = "~> 0.5"
+gleam_json = "~> 0.7"
