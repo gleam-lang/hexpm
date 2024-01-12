@@ -1,9 +1,9 @@
 import gleam/dynamic.{type DecodeError, type Dynamic, DecodeError} as dyn
-import gleam/map.{type Map}
+import gleam/dict.{type Dict}
 import gleam/option.{type Option, None}
 import gleam/function
 import gleam/result
-import birl/time.{type DateTime}
+import birl.{type Time}
 
 /// Information on a package from Hex's `/api/packages` endpoint.
 pub type Package {
@@ -12,24 +12,24 @@ pub type Package {
     html_url: Option(String),
     docs_html_url: Option(String),
     meta: PackageMeta,
-    downloads: Map(String, Int),
+    downloads: Dict(String, Int),
     owners: Option(List(PackageOwner)),
     releases: List(PackageRelease),
-    inserted_at: DateTime,
-    updated_at: DateTime,
+    inserted_at: Time,
+    updated_at: Time,
   )
 }
 
 pub type PackageMeta {
   PackageMeta(
-    links: Map(String, String),
+    links: Dict(String, String),
     licenses: List(String),
     description: Option(String),
   )
 }
 
 pub type PackageRelease {
-  PackageRelease(version: String, url: String, inserted_at: DateTime)
+  PackageRelease(version: String, url: String, inserted_at: Time)
 }
 
 pub type PackageOwner {
@@ -46,12 +46,12 @@ pub fn decode_package(data: Dynamic) -> Result(Package, List(DecodeError)) {
       "meta",
       dyn.decode3(
         PackageMeta,
-        dyn.field("links", dyn.map(dyn.string, dyn.string)),
+        dyn.field("links", dyn.dict(dyn.string, dyn.string)),
         dyn.field("licenses", dyn.list(dyn.string)),
         dyn.field("description", dyn.optional(dyn.string)),
       ),
     ),
-    dyn.field("downloads", dyn.map(dyn.string, dyn.int)),
+    dyn.field("downloads", dyn.dict(dyn.string, dyn.int)),
     dyn.any([
       dyn.field("owners", dyn.optional(dyn.list(decode_package_owner))),
       fn(_) { Ok(None) },
@@ -81,8 +81,8 @@ pub type Release {
     publisher: Option(PackageOwner),
     meta: ReleaseMeta,
     retirement: Option(ReleaseRetirement),
-    inserted_at: DateTime,
-    updated_at: DateTime,
+    inserted_at: Time,
+    updated_at: Time,
   )
 }
 
@@ -176,9 +176,9 @@ fn decode_package_owner(
   )(data)
 }
 
-fn decode_iso_timestamp(data: Dynamic) -> Result(DateTime, List(DecodeError)) {
+fn decode_iso_timestamp(data: Dynamic) -> Result(Time, List(DecodeError)) {
   use s <- result.then(dyn.string(data))
-  case time.from_iso8601(s) {
+  case birl.parse(s) {
     Ok(t) -> Ok(t)
     Error(_) -> Error([DecodeError("Timestamp", dyn.classify(data), [])])
   }
