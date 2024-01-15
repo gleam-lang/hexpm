@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.3.0 - 2024-1-12
+## v1.0.0 - 2024-01-12
 
 - Update for Gleam v0.33.0.
 - Update to latest version of dependencies.
