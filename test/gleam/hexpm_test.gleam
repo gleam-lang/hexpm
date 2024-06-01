@@ -1,11 +1,11 @@
-import gleam/json
+import birl.{type Time}
 import gleam/dict
-import gleam/option.{None, Some}
 import gleam/hexpm.{
   Package, PackageMeta, PackageOwner, PackageRelease, Release, ReleaseMeta,
   ReleaseRetirement, Security,
 }
-import birl.{type Time}
+import gleam/json
+import gleam/option.{None, Some}
 import gleeunit/should
 
 pub fn hex_package_decoder_test() {
