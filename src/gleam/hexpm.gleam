@@ -1,9 +1,8 @@
-import gleam/dynamic.{type DecodeError, type Dynamic, DecodeError} as dyn
-import gleam/dict.{type Dict}
-import gleam/option.{type Option, None}
-import gleam/function
-import gleam/result
 import birl.{type Time}
+import gleam/dict.{type Dict}
+import gleam/dynamic.{type DecodeError, type Dynamic, DecodeError} as dyn
+import gleam/option.{type Option, None}
+import gleam/result
 
 /// Information on a package from Hex's `/api/packages` endpoint.
 pub type Package {
@@ -137,7 +136,7 @@ pub fn decode_release(data: Dynamic) -> Result(Release, List(DecodeError)) {
       dyn.any([
         dyn.int,
         // For some unknown reason Hex will return [] when there are no downloads.
-        function.constant(Ok(0)),
+        fn(_) { Ok(0) },
       ]),
     ),
     dyn.field("publisher", dyn.optional(decode_package_owner)),
@@ -168,10 +167,7 @@ fn decode_package_owner(
   dyn.decode3(
     PackageOwner,
     dyn.field("username", dyn.string),
-    dyn.any([
-      dyn.field("email", dyn.optional(dyn.string)),
-      function.constant(Ok(None)),
-    ]),
+    dyn.any([dyn.field("email", dyn.optional(dyn.string)), fn(_) { Ok(None) }]),
     dyn.field("url", dyn.string),
   )(data)
 }
