@@ -1,4 +1,3 @@
-import birl.{type Time}
 import gleam/dict
 import gleam/hexpm.{
   Package, PackageMeta, PackageOwner, PackageRelease, Release, ReleaseMeta,
@@ -68,7 +67,7 @@ pub fn hex_package_decoder_test() {
   \"url\": \"https://hex.pm/api/packages/shimmer\"
 }"
 
-  let assert Ok(package) = json.decode(json_string, hexpm.decode_package)
+  let assert Ok(package) = json.parse(json_string, hexpm.package_decoder())
 
   package
   |> should.equal(Package(
@@ -108,9 +107,8 @@ pub fn hex_package_decoder_test() {
   ))
 }
 
-fn timestamp(string: String) -> Time {
-  let assert Ok(t) = birl.parse(string)
-  t
+fn timestamp(string: String) -> String {
+  string
 }
 
 pub fn hex_packages_decoder_test() {
@@ -158,7 +156,7 @@ pub fn hex_packages_decoder_test() {
   \"url\": \"https://hex.pm/api/packages/activity_pub\"
 }"
 
-  let assert Ok(package) = json.decode(json_string, hexpm.decode_package)
+  let assert Ok(package) = json.parse(json_string, hexpm.package_decoder())
 
   package
   |> should.equal(Package(
@@ -265,7 +263,7 @@ pub fn hex_release_decoder_test() {
   \"version\": \"0.0.3\"
 }"
 
-  let assert Ok(release) = json.decode(json_string, hexpm.decode_release)
+  let assert Ok(release) = json.parse(json_string, hexpm.release_decoder())
 
   release
   |> should.equal(Release(
@@ -327,7 +325,7 @@ pub fn hex_release_decoder_with_empty_list_downloads_test() {
   \"version\": \"0.0.3\"
 }"
 
-  let assert Ok(release) = json.decode(json_string, hexpm.decode_release)
+  let assert Ok(release) = json.parse(json_string, hexpm.release_decoder())
 
   release
   |> should.equal(Release(
