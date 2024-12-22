@@ -1,8 +1,6 @@
-import birl.{type Time}
 import gleam/dict.{type Dict}
-import gleam/dynamic.{type DecodeError, type Dynamic, DecodeError} as dyn
+import gleam/dynamic/decode as de
 import gleam/option.{type Option, None}
-import gleam/result
 
 /// Information on a package from Hex's `/api/packages` endpoint.
 pub type Package {
@@ -14,8 +12,8 @@ pub type Package {
     downloads: Dict(String, Int),
     owners: Option(List(PackageOwner)),
     releases: List(PackageRelease),
-    inserted_at: Time,
-    updated_at: Time,
+    inserted_at: String,
+    updated_at: String,
   )
 }
 
@@ -28,45 +26,51 @@ pub type PackageMeta {
 }
 
 pub type PackageRelease {
-  PackageRelease(version: String, url: String, inserted_at: Time)
+  PackageRelease(version: String, url: String, inserted_at: String)
 }
 
 pub type PackageOwner {
   PackageOwner(username: String, email: Option(String), url: String)
 }
 
-pub fn decode_package(data: Dynamic) -> Result(Package, List(DecodeError)) {
-  dyn.decode9(
-    Package,
-    dyn.field("name", dyn.string),
-    dyn.field("html_url", dyn.optional(dyn.string)),
-    dyn.field("docs_html_url", dyn.optional(dyn.string)),
-    dyn.field(
-      "meta",
-      dyn.decode3(
-        PackageMeta,
-        dyn.field("links", dyn.dict(dyn.string, dyn.string)),
-        dyn.field("licenses", dyn.list(dyn.string)),
-        dyn.field("description", dyn.optional(dyn.string)),
-      ),
-    ),
-    dyn.field("downloads", dyn.dict(dyn.string, dyn.int)),
-    dyn.any([
-      dyn.field("owners", dyn.optional(dyn.list(decode_package_owner))),
-      fn(_) { Ok(None) },
-    ]),
-    dyn.field(
-      "releases",
-      dyn.list(dyn.decode3(
-        PackageRelease,
-        dyn.field("version", dyn.string),
-        dyn.field("url", dyn.string),
-        dyn.field("inserted_at", decode_iso_timestamp),
-      )),
-    ),
-    dyn.field("inserted_at", decode_iso_timestamp),
-    dyn.field("updated_at", decode_iso_timestamp),
-  )(data)
+pub fn package_decoder() -> de.Decoder(Package) {
+  use name <- de.field("name", de.string)
+  use html_url <- de.field("html_url", de.optional(de.string))
+  use docs_html_url <- de.field("docs_html_url", de.optional(de.string))
+  use meta <- de.field("meta", {
+    use links <- de.field("links", de.dict(de.string, de.string))
+    use licenses <- de.field("licenses", de.list(de.string))
+    use description <- de.field("description", de.optional(de.string))
+    de.success(PackageMeta(links:, licenses:, description:))
+  })
+  use downloads <- de.field("downloads", de.dict(de.string, de.int))
+  use owners <- de.optional_field(
+    "owners",
+    None,
+    de.optional(de.list(package_owner_decoder())),
+  )
+  use releases <- de.field(
+    "releases",
+    de.list({
+      use version <- de.field("version", de.string)
+      use url <- de.field("url", de.string)
+      use inserted_at <- de.field("inserted_at", de.string)
+      de.success(PackageRelease(version:, url:, inserted_at:))
+    }),
+  )
+  use inserted_at <- de.field("inserted_at", de.string)
+  use updated_at <- de.field("updated_at", de.string)
+  de.success(Package(
+    name:,
+    html_url:,
+    docs_html_url:,
+    meta:,
+    downloads:,
+    owners:,
+    releases:,
+    inserted_at:,
+    updated_at:,
+  ))
 }
 
 /// Information on a release from Hex's `/api/packages/:name/releases/:version`
@@ -80,8 +84,8 @@ pub type Release {
     publisher: Option(PackageOwner),
     meta: ReleaseMeta,
     retirement: Option(ReleaseRetirement),
-    inserted_at: Time,
-    updated_at: Time,
+    inserted_at: String,
+    updated_at: String,
   )
 }
 
@@ -102,16 +106,14 @@ pub type RetirementReason {
   Renamed
 }
 
-pub fn decode_retirement_reason(
-  data: Dynamic,
-) -> Result(RetirementReason, List(DecodeError)) {
-  case dyn.string(data) {
-    Error(e) -> Error(e)
-    Ok("invalid") -> Ok(Invalid)
-    Ok("security") -> Ok(Security)
-    Ok("deprecated") -> Ok(Deprecated)
-    Ok("renamed") -> Ok(Renamed)
-    Ok(_) -> Ok(OtherReason)
+pub fn retirement_reason_decoder() -> de.Decoder(RetirementReason) {
+  use string <- de.then(de.string)
+  case string {
+    "invalid" -> de.success(Invalid)
+    "security" -> de.success(Security)
+    "deprecated" -> de.success(Deprecated)
+    "renamed" -> de.success(Renamed)
+    _ -> de.failure(Invalid, "RetirementReason")
   }
 }
 
@@ -125,57 +127,46 @@ pub fn retirement_reason_to_string(reason: RetirementReason) -> String {
   }
 }
 
-pub fn decode_release(data: Dynamic) -> Result(Release, List(DecodeError)) {
-  dyn.decode9(
-    Release,
-    dyn.field("version", dyn.string),
-    dyn.field("url", dyn.string),
-    dyn.field("checksum", dyn.string),
-    dyn.field(
-      "downloads",
-      dyn.any([
-        dyn.int,
-        // For some unknown reason Hex will return [] when there are no downloads.
-        fn(_) { Ok(0) },
-      ]),
-    ),
-    dyn.field("publisher", dyn.optional(decode_package_owner)),
-    dyn.field(
-      "meta",
-      dyn.decode2(
-        ReleaseMeta,
-        dyn.field("app", dyn.optional(dyn.string)),
-        dyn.field("build_tools", dyn.list(dyn.string)),
-      ),
-    ),
-    dyn.field(
-      "retirement",
-      dyn.optional(dyn.decode2(
-        ReleaseRetirement,
-        dyn.field("reason", decode_retirement_reason),
-        dyn.field("message", dyn.optional(dyn.string)),
-      )),
-    ),
-    dyn.field("inserted_at", decode_iso_timestamp),
-    dyn.field("updated_at", decode_iso_timestamp),
-  )(data)
+pub fn release_decoder() -> de.Decoder(Release) {
+  use version <- de.field("version", de.string)
+  use url <- de.field("url", de.string)
+  use checksum <- de.field("checksum", de.string)
+  // For some unknown reason Hex will return [] when there are no downloads.
+  use downloads <- de.field("downloads", de.one_of(de.int, [de.success(0)]))
+  use publisher <- de.field("publisher", de.optional(package_owner_decoder()))
+  use meta <- de.field("meta", {
+    use app <- de.optional_field("app", None, de.optional(de.string))
+    use build_tools <- de.field("build_tools", de.list(de.string))
+    de.success(ReleaseMeta(app:, build_tools:))
+  })
+  use retirement <- de.optional_field(
+    "retirement",
+    None,
+    de.optional({
+      use reason <- de.field("reason", retirement_reason_decoder())
+      use message <- de.field("message", de.optional(de.string))
+      de.success(ReleaseRetirement(reason:, message:))
+    }),
+  )
+
+  use inserted_at <- de.field("inserted_at", de.string)
+  use updated_at <- de.field("updated_at", de.string)
+  de.success(Release(
+    version:,
+    url:,
+    checksum:,
+    downloads:,
+    publisher:,
+    meta:,
+    retirement:,
+    inserted_at:,
+    updated_at:,
+  ))
 }
 
-fn decode_package_owner(
-  data: Dynamic,
-) -> Result(PackageOwner, List(DecodeError)) {
-  dyn.decode3(
-    PackageOwner,
-    dyn.field("username", dyn.string),
-    dyn.any([dyn.field("email", dyn.optional(dyn.string)), fn(_) { Ok(None) }]),
-    dyn.field("url", dyn.string),
-  )(data)
-}
-
-fn decode_iso_timestamp(data: Dynamic) -> Result(Time, List(DecodeError)) {
-  use s <- result.then(dyn.string(data))
-  case birl.parse(s) {
-    Ok(t) -> Ok(t)
-    Error(_) -> Error([DecodeError("Timestamp", dyn.classify(data), [])])
-  }
+fn package_owner_decoder() -> de.Decoder(PackageOwner) {
+  use username <- de.field("username", de.string)
+  use email <- de.optional_field("email", None, de.optional(de.string))
+  use url <- de.field("url", de.string)
+  de.success(PackageOwner(username:, email:, url:))
 }
