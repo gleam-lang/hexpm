@@ -1,6 +1,7 @@
 import gleam/dict.{type Dict}
 import gleam/dynamic/decode as de
 import gleam/option.{type Option, None}
+import gleam/time/timestamp.{type Timestamp}
 
 /// Information on a package from Hex's `/api/packages` endpoint.
 pub type Package {
@@ -12,8 +13,8 @@ pub type Package {
     downloads: Dict(String, Int),
     owners: Option(List(PackageOwner)),
     releases: List(PackageRelease),
-    inserted_at: String,
-    updated_at: String,
+    inserted_at: Timestamp,
+    updated_at: Timestamp,
   )
 }
 
@@ -26,7 +27,7 @@ pub type PackageMeta {
 }
 
 pub type PackageRelease {
-  PackageRelease(version: String, url: String, inserted_at: String)
+  PackageRelease(version: String, url: String, inserted_at: Timestamp)
 }
 
 pub type PackageOwner {
@@ -54,12 +55,12 @@ pub fn package_decoder() -> de.Decoder(Package) {
     de.list({
       use version <- de.field("version", de.string)
       use url <- de.field("url", de.string)
-      use inserted_at <- de.field("inserted_at", de.string)
+      use inserted_at <- de.field("inserted_at", timestamp_decoder())
       de.success(PackageRelease(version:, url:, inserted_at:))
     }),
   )
-  use inserted_at <- de.field("inserted_at", de.string)
-  use updated_at <- de.field("updated_at", de.string)
+  use inserted_at <- de.field("inserted_at", timestamp_decoder())
+  use updated_at <- de.field("updated_at", timestamp_decoder())
   de.success(Package(
     name:,
     html_url:,
@@ -73,6 +74,14 @@ pub fn package_decoder() -> de.Decoder(Package) {
   ))
 }
 
+fn timestamp_decoder() -> de.Decoder(Timestamp) {
+  use string <- de.then(de.string)
+  case timestamp.parse_rfc3339(string) {
+    Ok(timestamp) -> de.success(timestamp)
+    Error(_) -> de.failure(timestamp.from_unix_seconds(0), "Timestamp")
+  }
+}
+
 /// Information on a release from Hex's `/api/packages/:name/releases/:version`
 /// endpoint.
 pub type Release {
@@ -84,8 +93,8 @@ pub type Release {
     publisher: Option(PackageOwner),
     meta: ReleaseMeta,
     retirement: Option(ReleaseRetirement),
-    inserted_at: String,
-    updated_at: String,
+    inserted_at: Timestamp,
+    updated_at: Timestamp,
   )
 }
 
@@ -149,8 +158,8 @@ pub fn release_decoder() -> de.Decoder(Release) {
     }),
   )
 
-  use inserted_at <- de.field("inserted_at", de.string)
-  use updated_at <- de.field("updated_at", de.string)
+  use inserted_at <- de.field("inserted_at", timestamp_decoder())
+  use updated_at <- de.field("updated_at", timestamp_decoder())
   de.success(Release(
     version:,
     url:,

@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.0 - 2025-04-03
+
+- `gleam_time` is now used for the time types.
+
 ## v2.0.0 - 2024-12-22
 
 - Updated for `gleam_stdlib` v0.51.0.

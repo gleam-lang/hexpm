@@ -1,5 +1,5 @@
 name = "gleam_hexpm"
-version = "2.0.0"
+version = "3.0.0"
 description = "Gleam dynamic decoders for the API of Hex, the package manager for the BEAM ecosystem."
 
 licences = ["Apache-2.0"]
@@ -12,6 +12,7 @@ gleam = ">= 1.5.0"
 
 [dependencies]
 gleam_stdlib = ">= 0.51.0 and < 2.0.0"
+gleam_time = ">= 1.1.0 and < 2.0.0"
 
 [dev-dependencies]
 gleam_json = "> 2.1.0 and < 3.0.0"

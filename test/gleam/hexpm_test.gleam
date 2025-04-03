@@ -5,6 +5,7 @@ import gleam/hexpm.{
 }
 import gleam/json
 import gleam/option.{None, Some}
+import gleam/time/timestamp
 import gleeunit/should
 
 pub fn hex_package_decoder_test() {
@@ -107,8 +108,9 @@ pub fn hex_package_decoder_test() {
   ))
 }
 
-fn timestamp(string: String) -> String {
-  string
+fn timestamp(string: String) -> timestamp.Timestamp {
+  let assert Ok(timestamp) = timestamp.parse_rfc3339(string)
+  timestamp
 }
 
 pub fn hex_packages_decoder_test() {
