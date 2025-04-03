@@ -11,7 +11,7 @@ manager for the BEAM ecosystem.
 This package can be added to your Gleam project:
 
 ```sh
-gleam add gleam_hexpm@2
+gleam add gleam_hexpm@3
 ```
 
 and its documentation can be found at <https://hexdocs.pm/gleam_hexpm>.
