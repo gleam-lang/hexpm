@@ -122,7 +122,7 @@ pub fn retirement_reason_decoder() -> de.Decoder(RetirementReason) {
     "security" -> de.success(Security)
     "deprecated" -> de.success(Deprecated)
     "renamed" -> de.success(Renamed)
-    _ -> de.failure(Invalid, "RetirementReason")
+    _ -> de.success(OtherReason)
   }
 }
 

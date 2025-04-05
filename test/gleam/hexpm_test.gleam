@@ -349,3 +349,79 @@ pub fn hex_release_decoder_with_empty_list_downloads_test() {
     inserted_at: timestamp("2022-07-07T19:14:04.497803Z"),
   ))
 }
+
+pub fn hex_release_decoder_with_problem_retirement_test() {
+  let json =
+    "
+{
+  \"meta\": {
+    \"elixir\": \"~> 1.9\",
+    \"app\": \"appsignal\",
+    \"build_tools\": [
+      \"mix\",
+      \"make\"
+    ]
+  },
+  \"version\": \"2.2.12\",
+  \"checksum\": \"12084e2f6907b470a228f32e9814aefab6c8c6dfb1a6a8cc62958c5e244c67a5\",
+  \"url\": \"https://hex.pm/api/packages/appsignal/releases/2.2.12\",
+  \"has_docs\": true,
+  \"inserted_at\": \"2022-05-30T12:03:20.517280Z\",
+  \"updated_at\": \"2022-05-30T13:01:47.844437Z\",
+  \"retirement\": {
+    \"message\": \"Introduces a bug where session data is no longer sent, please upgrade to 2.2.13+\",
+    \"reason\": \"other\"
+  },
+  \"downloads\": 291,
+  \"publisher\": {
+    \"url\": \"https://hex.pm/api/users/jkreeftmeijer\",
+    \"email\": \"jeffkreeftmeijer@gmail.com\",
+    \"username\": \"jkreeftmeijer\"
+  },
+  \"requirements\": {
+    \"decorator\": {
+      \"optional\": false,
+      \"app\": \"decorator\",
+      \"requirement\": \"~> 1.2.3 or ~> 1.3\"
+    },
+    \"hackney\": {
+      \"optional\": false,
+      \"app\": \"hackney\",
+      \"requirement\": \"~> 1.6\"
+    },
+    \"jason\": {
+      \"optional\": true,
+      \"app\": \"jason\",
+      \"requirement\": \"~> 1.0\"
+    },
+    \"poison\": {
+      \"optional\": true,
+      \"app\": \"poison\",
+      \"requirement\": \">= 1.3.0\"
+    },
+    \"telemetry\": {
+      \"optional\": false,
+      \"app\": \"telemetry\",
+      \"requirement\": \"~> 0.4 or ~> 1.0\"
+    }
+  },
+  \"docs_html_url\": \"https://hexdocs.pm/appsignal/2.2.12/\",
+  \"package_url\": \"https://hex.pm/api/packages/appsignal\",
+  \"html_url\": \"https://hex.pm/packages/appsignal/2.2.12\",
+  \"configs\": {
+    \"erlang.mk\": \"dep_appsignal = hex 2.2.12\"
+  }
+}
+    "
+  let assert Ok(release) = json.parse(json, hexpm.release_decoder())
+
+  release.retirement
+  |> should.equal(
+    Some(ReleaseRetirement(
+      hexpm.OtherReason,
+      Some(
+        "Introduces a bug where session data is no longer sent, please upgrade to 2.2.13+",
+      ),
+    )),
+  )
+}

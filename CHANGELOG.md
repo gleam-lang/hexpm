@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.1 - 2025-04-05
+
+- Fix a bug where "other" retirement reason would fail to decode.
+
 ## v3.0.0 - 2025-04-03
 
 - `gleam_time` is now used for the time types.
